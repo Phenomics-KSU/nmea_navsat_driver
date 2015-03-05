@@ -1,15 +1,27 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(nmea_navsat_driver)
 
-find_package(catkin REQUIRED COMPONENTS roslint)
+find_package(catkin REQUIRED COMPONENTS roslint std_msgs message_generation)
+
+## Generate messages in the 'msg' folder
+add_message_files(
+  FILES
+  AVR.msg
+)
 
 catkin_python_setup()
+
+generate_messages(
+	DEPENDENCIES
+	std_msgs
+)
+
 catkin_package()
 
 install(PROGRAMS
-   scripts/nmea_serial_driver
-   scripts/nmea_topic_driver
-   scripts/nmea_topic_serial_reader
+   scripts/nmea_serial_driver.py
+   scripts/nmea_topic_driver.py
+   scripts/nmea_topic_serial_reader.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

@@ -120,20 +120,54 @@ parse_maps = {
         ("longitude_direction", str, 6),
         ("speed", convert_knots_to_mps, 7),
         ("true_course", convert_deg_to_rads, 8),
+        ],
+    "AVR": [
+        # Every index is 1 higher since the type takes up two fields.
+        ("utc_time", safe_float, 2),
+        ("yaw_rad", convert_deg_to_rads, 3),
+        ("tilt_rad", convert_deg_to_rads, 5),
+        ("range", safe_float, 9),
+        ("gps_quality", safe_int, 10),
+        ("pdop", safe_float, 11),
+        ("sats_used", safe_int, 12),
         ]
     }
 
 
 def parse_nmea_sentence(nmea_sentence):
+        
+    # Check for standard GPS sentence.
+    is_gps_sentence = re.match('^\$GP.*\*[0-9A-Fa-f]{2}$', nmea_sentence)
+        
+    # Need to handle trimble proprietary sentences that begin with the field PTNL.
+    if is_gps_sentence:
+        is_trimble_sentence = False
+    else:
+        is_trimble_sentence = re.match('^\$PTNL.*\*[0-9A-Fa-f]{2}$', nmea_sentence)
+    
     # Check for a valid nmea sentence
-    if not re.match('^\$GP.*\*[0-9A-Fa-f]{2}$', nmea_sentence):
+    if not (is_gps_sentence or is_trimble_sentence):
         logger.debug("Regex didn't match, sentence not valid NMEA? Sentence was: %s"
                      % repr(nmea_sentence))
         return False
+    
     fields = [field.strip(',') for field in nmea_sentence.split(',')]
 
-    # Ignore the $ and talker ID portions (e.g. GP)
-    sentence_type = fields[0][3:]
+    # The regex probably checks for this, but I can't understand it well enough
+    # so I'm putting this here to be safe.
+    if len(fields) < 2:
+        logger.debug("Not enough fields. Sentence was: %s" % repr(nmea_sentence))
+        return False
+    
+    # Remove checksum from last field since it's already been checked.
+    fields[-1] = (fields[-1].split('*')[0]).strip()
+
+    if is_gps_sentence:
+        # Ignore $ and GP
+        sentence_type = fields[0][3:]
+    elif is_trimble_sentence:
+        # The actual sentence type is the second field.
+        sentence_type = fields[1]
 
     if not sentence_type in parse_maps:
         logger.debug("Sentence type %s not in parse map, ignoring."

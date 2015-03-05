@@ -40,18 +40,20 @@ from geometry_msgs.msg import TwistStamped
 from libnmea_navsat_driver.checksum_utils import check_nmea_checksum
 import libnmea_navsat_driver.parser
 
+from nmea_navsat_driver.msg import AVR
+
 
 class RosNMEADriver(object):
     def __init__(self):
         self.fix_pub = rospy.Publisher('fix', NavSatFix, queue_size=1)
         self.vel_pub = rospy.Publisher('vel', TwistStamped, queue_size=1)
         self.time_ref_pub = rospy.Publisher('time_reference', TimeReference, queue_size=1)
+        self.avr_pub = rospy.Publisher('avr', AVR, queue_size=10)
 
         self.time_ref_source = rospy.get_param('~time_ref_source', None)
         self.use_RMC = rospy.get_param('~useRMC', False)
 
-    # Returns True if we successfully did something with the passed in
-    # nmea_string
+    # Returns True if we successfully did something with the passed in nmea_string
     def add_sentence(self, nmea_string, frame_id, timestamp=None):
         if not check_nmea_checksum(nmea_string):
             rospy.logwarn("Received a sentence with an invalid checksum. " +
@@ -60,7 +62,7 @@ class RosNMEADriver(object):
 
         parsed_sentence = libnmea_navsat_driver.parser.parse_nmea_sentence(nmea_string)
         if not parsed_sentence:
-            rospy.logdebug("Failed to parse NMEA sentence. Sentece was: %s" % nmea_string)
+            rospy.logdebug("Failed to parse NMEA sentence. Sentence was: %s" % nmea_string)
             return False
 
         if timestamp:
@@ -165,6 +167,24 @@ class RosNMEADriver(object):
                 current_vel.twist.linear.y = data['speed'] * \
                     math.cos(data['true_course'])
                 self.vel_pub.publish(current_vel)
+                
+        elif 'AVR' in parsed_sentence:
+            
+            data = parsed_sentence['AVR']
+            
+            avr = AVR()
+            avr.header.stamp = current_time
+            avr.header.frame_id = frame_id
+
+            avr.utc_time = data['utc_time']
+            avr.yaw = data['yaw_rad']
+            avr.tilt = data['tilt_rad']
+            avr.range = data['range']
+            avr.pdop = data['pdop']
+            avr.sats_used = data['sats_used']
+
+            self.avr_pub.publish(avr)
+
         else:
             return False
 
