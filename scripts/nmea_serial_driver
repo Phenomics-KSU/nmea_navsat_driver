@@ -64,7 +64,7 @@ if __name__ == '__main__':
             rospy.logwarn("The test file {0} does not exist.".format(test_file))
                           
     try:
-        
+        rospy.loginfo("Trying to open port {0} with baud {1}".format(serial_port, serial_baud))
         GPS = serial.Serial(port=serial_port, baudrate=serial_baud, timeout=2)
         driver = libnmea_navsat_driver.driver.RosNMEADriver()
         while not rospy.is_shutdown():
