@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(nmea_navsat_driver)
 
-find_package(catkin REQUIRED COMPONENTS roslint std_msgs message_generation)
+find_package(catkin REQUIRED COMPONENTS std_msgs message_generation)
 
 ## Generate messages in the 'msg' folder
 add_message_files(
@@ -26,5 +26,5 @@ install(PROGRAMS
 )
 
 # Check package for pep8 style, add a test to fail on violations.
-roslint_python()
-roslint_add_test()
+#roslint_python()
+#roslint_add_test()

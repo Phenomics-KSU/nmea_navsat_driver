@@ -179,6 +179,7 @@ class RosNMEADriver(object):
             avr.utc_time = data['utc_time']
             avr.yaw = data['yaw_rad']
             avr.tilt = data['tilt_rad']
+            avr.gps_quality = data['gps_quality']
             avr.range = data['range']
             avr.pdop = data['pdop']
             avr.sats_used = data['sats_used']
