@@ -124,8 +124,8 @@ parse_maps = {
     "AVR": [
         # Every index is 1 higher since the type takes up two fields.
         ("utc_time", safe_float, 2),
-        ("yaw_rad", convert_deg_to_rads, 3),
-        ("tilt_rad", convert_deg_to_rads, 5),
+        ("yaw_deg", safe_float, 3),
+        ("tilt_deg", safe_float, 5),
         ("range", safe_float, 9),
         ("gps_quality", safe_int, 10),
         ("pdop", safe_float, 11),

@@ -32,6 +32,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+import sys
 import os.path
 import serial
 
@@ -48,20 +49,23 @@ if __name__ == '__main__':
     
     test_file = rospy.get_param('~test_file', '')
     
-    if test_file != '':
-        if os.path.isfile(test_file):
-            rate = rospy.Rate(10) # 10hz
-            file = open(test_file, 'r')
-            driver = libnmea_navsat_driver.driver.RosNMEADriver()
-            while not rospy.is_shutdown():
-                data = file.readline().strip()
-                try:
-                    driver.add_sentence(data, frame_id)
-                except ValueError as e:
-                    rospy.logwarn("Value error, likely due to missing fields in the NMEA message. Error was: %s." % e)
-                rate.sleep()
-        else:
-            rospy.logwarn("The test file {0} does not exist.".format(test_file))
+    try:
+        if test_file != '':
+            if os.path.isfile(test_file):
+                rate = rospy.Rate(10) # 10hz
+                file = open(test_file, 'r')
+                driver = libnmea_navsat_driver.driver.RosNMEADriver()
+                while not rospy.is_shutdown():
+                    data = file.readline().strip()
+                    try:
+                        driver.add_sentence(data, frame_id)
+                    except ValueError as e:
+                        rospy.logwarn("Value error, likely due to missing fields in the NMEA message. Error was: %s." % e)
+                    rate.sleep()
+            else:
+                rospy.logwarn("The test file {0} does not exist.".format(test_file))
+    except rospy.ROSInterruptException:
+        sys.exit(0) # So don't try to open serial port
                           
     try:
         rospy.loginfo("Trying to open port {0} with baud {1}".format(serial_port, serial_baud))
