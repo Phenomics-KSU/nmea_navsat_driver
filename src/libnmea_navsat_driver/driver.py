@@ -49,6 +49,7 @@ class RosNMEADriver(object):
         self.vel_pub = rospy.Publisher('vel', TwistStamped, queue_size=1)
         self.time_ref_pub = rospy.Publisher('time_reference', TimeReference, queue_size=1)
         self.avr_pub = rospy.Publisher('avr', AVR, queue_size=10)
+        self.ggk_pub = rospy.Publisher('ggk', GGK, queue_size=10)
 
         self.time_ref_source = rospy.get_param('~time_ref_source', None)
         self.use_RMC = rospy.get_param('~useRMC', False)
@@ -185,6 +186,34 @@ class RosNMEADriver(object):
             avr.sats_used = data['sats_used']
 
             self.avr_pub.publish(avr)
+            
+        elif 'GGK' in parsed_sentence:
+            
+            data = parsed_sentence['GGK']
+            
+            ggk = GGK()
+            ggk.header.stamp = current_time
+            ggk.header.frame_id = frame_id
+
+            ggk.utc_time = data['utc_time']
+            
+            latitude = data['latitude']
+            if data['latitude_direction'] == 'S':
+                latitude = -latitude
+            ggk.latitude = latitude
+
+            longitude = data['longitude']
+            if data['longitude_direction'] == 'W':
+                longitude = -longitude
+            ggk.longitude = longitude
+            
+            ggk.altitude = data['height_above_ellipsoid']
+
+            ggk.gps_quality = data['gps_quality']
+            ggk.dop = data['dop']
+            ggk.sats_used = data['sats_used']
+
+            self.ggk_pub.publish(ggk)
 
         else:
             return False

@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS std_msgs message_generation)
 add_message_files(
   FILES
   AVR.msg
+  GGK.msg
 )
 
 catkin_python_setup()

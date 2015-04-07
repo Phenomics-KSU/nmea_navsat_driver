@@ -2,7 +2,7 @@ Header header
 float64 utc_time
 float64 yaw_deg
 float64 tilt_deg
-float64 range
-int8 gps_quality
-float64 pdop
-int8 sats_used
+float64 range    # meters
+int8 gps_quality # 0-4
+float64 pdop     # Precision dilution of precision
+int8 sats_used 

@@ -130,6 +130,18 @@ parse_maps = {
         ("gps_quality", safe_int, 10),
         ("pdop", safe_float, 11),
         ("sats_used", safe_int, 12),
+        ],
+    "GGK": [
+        # Every index is 1 higher since the type takes up two fields.
+        ("utc_time", convert_time, 2),
+        ("latitude", convert_latitude, 4),
+        ("latitude_direction", str, 5),
+        ("longitude", convert_longitude, 6),
+        ("longitude_direction", str, 7),
+        ("gps_quality", safe_int, 8),
+        ("num_satellites", safe_int, 9),
+        ("dop", safe_float, 10),
+        ("height_above_ellipsoid", str, 11), # has prefix EHT
         ]
     }
 
