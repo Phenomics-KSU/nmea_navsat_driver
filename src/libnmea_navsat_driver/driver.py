@@ -41,6 +41,7 @@ from libnmea_navsat_driver.checksum_utils import check_nmea_checksum
 import libnmea_navsat_driver.parser
 
 from nmea_navsat_driver.msg import AVR
+from nmea_navsat_driver.msg import GGK
 
 
 class RosNMEADriver(object):
@@ -48,8 +49,8 @@ class RosNMEADriver(object):
         self.fix_pub = rospy.Publisher('fix', NavSatFix, queue_size=1)
         self.vel_pub = rospy.Publisher('vel', TwistStamped, queue_size=1)
         self.time_ref_pub = rospy.Publisher('time_reference', TimeReference, queue_size=1)
-        self.avr_pub = rospy.Publisher('avr', AVR, queue_size=10)
-        self.ggk_pub = rospy.Publisher('ggk', GGK, queue_size=10)
+        self.avr_pub = rospy.Publisher('avr', AVR, queue_size=100)
+        self.ggk_pub = rospy.Publisher('ggk', GGK, queue_size=100)
 
         self.time_ref_source = rospy.get_param('~time_ref_source', None)
         self.use_RMC = rospy.get_param('~useRMC', False)
@@ -207,7 +208,14 @@ class RosNMEADriver(object):
                 longitude = -longitude
             ggk.longitude = longitude
             
-            ggk.altitude = data['height_above_ellipsoid']
+            # Strip off EHT prefix and convert to float
+            try:
+                altitude = data['height_above_ellipsoid']
+                altitude = float(altitude[3:])
+            except ValueError:
+                altitude = 0
+            
+            ggk.altitude = altitude
 
             ggk.gps_quality = data['gps_quality']
             ggk.dop = data['dop']

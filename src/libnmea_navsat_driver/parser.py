@@ -100,7 +100,7 @@ tuple of tuples where each tuple is a field name, conversion function and index
 into the split sentence"""
 parse_maps = {
     "GGA": [
-        ("fix_type", int, 6),
+        ("fix_type", safe_int, 6),
         ("latitude", convert_latitude, 2),
         ("latitude_direction", str, 3),
         ("longitude", convert_longitude, 4),
@@ -139,7 +139,7 @@ parse_maps = {
         ("longitude", convert_longitude, 6),
         ("longitude_direction", str, 7),
         ("gps_quality", safe_int, 8),
-        ("num_satellites", safe_int, 9),
+        ("sats_used", safe_int, 9),
         ("dop", safe_float, 10),
         ("height_above_ellipsoid", str, 11), # has prefix EHT
         ]
