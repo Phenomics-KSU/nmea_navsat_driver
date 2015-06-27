@@ -70,7 +70,7 @@ def convert_time(nmea_utc):
     else:
         hours = int(nmea_utc[0:2])
         minutes = int(nmea_utc[2:4])
-        seconds = int(nmea_utc[4:6])
+        seconds = float(nmea_utc[4:])
         utc_list[3] = hours
         utc_list[4] = minutes
         utc_list[5] = seconds
@@ -123,7 +123,7 @@ parse_maps = {
         ],
     "AVR": [
         # Every index is 1 higher since the type takes up two fields.
-        ("utc_time", safe_float, 2),
+        ("utc_time", convert_time, 2),
         ("yaw_deg", safe_float, 3),
         ("tilt_deg", safe_float, 5),
         ("range", safe_float, 9),
