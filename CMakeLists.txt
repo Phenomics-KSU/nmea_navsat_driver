@@ -23,6 +23,7 @@ install(PROGRAMS
    scripts/nmea_serial_driver.py
    scripts/nmea_topic_driver.py
    scripts/nmea_topic_serial_reader.py
+   scripts/log_publisher.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
