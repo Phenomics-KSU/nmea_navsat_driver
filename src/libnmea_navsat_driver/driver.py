@@ -46,17 +46,20 @@ from nmea_navsat_driver.msg import GGK
 
 class RosNMEADriver(object):
     def __init__(self):
+        
+        # Keep queue size at 1 to make sure old messages don't get built up
+        # which would add delay to control and latency for sensor timestamps.
         self.fix_pub = rospy.Publisher('fix', NavSatFix, queue_size=1)
         self.vel_pub = rospy.Publisher('vel', TwistStamped, queue_size=1)
         self.time_ref_pub = rospy.Publisher('time_reference', TimeReference, queue_size=1)
-        self.avr_pub = rospy.Publisher('avr', AVR, queue_size=100)
-        self.ggk_pub = rospy.Publisher('ggk', GGK, queue_size=100)
+        self.avr_pub = rospy.Publisher('avr', AVR, queue_size=1)
+        self.ggk_pub = rospy.Publisher('ggk', GGK, queue_size=1)
 
         self.time_ref_source = rospy.get_param('~time_ref_source', None)
         self.use_RMC = rospy.get_param('~useRMC', False)
 
-    # Returns True if we successfully did something with the passed in nmea_string
     def add_sentence(self, nmea_string, frame_id, timestamp=None):
+        '''Return True if we successfully did something with the passed in nmea_string'''
         if not check_nmea_checksum(nmea_string):
             rospy.logwarn("Received a sentence with an invalid checksum. " +
                           "Sentence was: %s" % repr(nmea_string))
